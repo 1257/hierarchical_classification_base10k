@@ -5,7 +5,7 @@
 
 author baiyu
 """
-
+import wandb
 import os
 import sys
 import argparse
@@ -39,6 +39,7 @@ def train(epoch):
         optimizer.zero_grad()
         outputs = net(images)
         loss = loss_function(outputs, labels)
+        wandb.log({"loss": loss})
         loss.backward()
         optimizer.step()
 
@@ -118,6 +119,9 @@ def eval_training(epoch=0, tb=True):
 
 if __name__ == '__main__':
 
+    wandb.init(project="base10K", entity="hierarchical_classification")
+    wandb.config = {"epochs": 200, "batch_size": 128}
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('-net', type=str, required=True, help='net type')
     parser.add_argument('-gpu', action='store_true', default=False, help='use gpu or not')
@@ -211,6 +215,7 @@ if __name__ == '__main__':
 
         train(epoch)
         acc = eval_training(epoch)
+        wandb.log({"accuracy": acc})
 
         #start to save best performance model after learning rate decay to 0.01
         if epoch > settings.MILESTONES[1] and best_acc < acc:
