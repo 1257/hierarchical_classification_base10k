@@ -26,7 +26,7 @@ from conf import settings
 from utils import get_network, get_training_dataloader, get_test_dataloader, WarmUpLR, \
     most_recent_folder, most_recent_weights, last_epoch, best_acc_weights
 
-def train(epoch):
+def train(cifar100_training_loader, warmup_scheduler, epoch):
 
     start = time.time()
     net.train()
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     net = get_network(args)
 
     #data preprocessing:
-    cifar100_training_loader = get_training_dataloader(
+    cifar100_training_loader1, cifar100_training_loader2 = get_training_dataloader(
         settings.CIFAR100_TRAIN_MEAN,
         settings.CIFAR100_TRAIN_STD,
         num_workers=4,
@@ -153,8 +153,10 @@ if __name__ == '__main__':
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=settings.MILESTONES, gamma=0.2) #learning rate decay
-    iter_per_epoch = len(cifar100_training_loader)
-    warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args.warm)
+    iter_per_epoch1 = len(cifar100_training_loader1)
+    iter_per_epoch2 = len(cifar100_training_loader2)
+    warmup_scheduler1 = WarmUpLR(optimizer, iter_per_epoch1 * args.warm)
+    warmup_scheduler2 = WarmUpLR(optimizer, iter_per_epoch2 * args.warm)
 
     if args.resume:
         recent_folder = most_recent_folder(os.path.join(settings.CHECKPOINT_PATH, args.net), fmt=settings.DATE_FORMAT)
@@ -213,7 +215,7 @@ if __name__ == '__main__':
             if epoch <= resume_epoch:
                 continue
 
-        train(epoch)
+        train(cifar100_training_loader1, warmup_scheduler1, epoch)
         acc = eval_training(epoch)
         wandb.log({"accuracy": acc})
 
