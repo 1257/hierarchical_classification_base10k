@@ -188,10 +188,8 @@ def get_training_dataloader(mean, std, batch_size=16, num_workers=2, shuffle=Tru
     
     #sav begin:
     cifar100_trainset1, cifar100_trainset2 = torch.utils.data.random_split(cifar100_training, [10000, 40000], generator=torch.Generator().manual_seed(0))
-    for sample in cifar100_trainset1:
-        if sample in cifar100_trainset2:
-            print('Datasets have common objects')
-            break
+    print('First dataset size:', len(cifar100_trainset1))
+    print('Second dataset size:', len(cifar100_trainset2))
     
     cifar100_training_loader1 = DataLoader(
         cifar100_trainset1, shuffle=shuffle, num_workers=num_workers, batch_size=batch_size)
