@@ -132,6 +132,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     net = get_network(args)
+    net.set_output_size(20)
+    net.set_output_size(100)
 
     #data preprocessing:
     cifar100_training_loader1, cifar100_training_loader2 = get_training_dataloader(
