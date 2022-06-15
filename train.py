@@ -45,6 +45,8 @@ def train(cifar100_training_loader, warmup_scheduler, epoch):
 
         n_iter = (epoch - 1) * len(cifar100_training_loader) + batch_index + 1
 
+        print(list(net.children()))
+        input()
         last_layer = list(net.children())[-1]
         for name, para in last_layer.named_parameters():
             if 'weight' in name:
